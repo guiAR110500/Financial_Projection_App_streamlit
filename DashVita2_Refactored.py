@@ -4,10 +4,20 @@ from container import container
 from config.settings import ConfigManager
 from core.base_classes import SessionStateManager
 from utils.ui_components import load_css
-from pages.investment_pages import PremissasInvestimentosPage, InvestimentosVisualizationPage
 
-# Import the remaining pages from original file - these would be refactored similarly
-# For demonstration, showing the pattern with investment pages
+# Import all refactored pages
+from pages.investment_pages import PremissasInvestimentosPage, InvestimentosVisualizationPage
+from pages.despesas_pages import PremissasDespesasPage, DespesasAdministrativasPage
+from pages.receitas_pages import PremissasReceitasPage, ReceitasVisualizationPage
+
+# Import remaining pages from original file (to be gradually migrated)
+import sys
+sys.path.append('.')
+from DashVita2 import (
+    PremissasComissao, ComissaoVendas, PremissasTributos, Tributos,
+    Equipe, CustosTecnologia, PremissasProjecoes, ProjecaodeFluxodeCaixa,
+    ProjecaoDRE, PaginaAcompanhamento, MetasColabs, ProjecaoInicial
+)
 
 class Application:
     """Main application class following SOLID principles"""
@@ -26,13 +36,37 @@ class Application:
         # Create pages using dependency injection
         self.page_groups = {
             "Página Inicial": [
-                # PaginaAcompanhamento would be refactored similarly
+                PaginaAcompanhamento(),
+                MetasColabs(), 
+                ProjecaoInicial()
             ],
             "Investimentos": [
                 container.create_with_dependencies(PremissasInvestimentosPage),
                 container.create_with_dependencies(InvestimentosVisualizationPage)
             ],
-            # Other page groups would be added here after refactoring
+            "Despesas": [
+                container.create_with_dependencies(PremissasDespesasPage),
+                container.create_with_dependencies(DespesasAdministrativasPage),
+                Equipe(),
+                CustosTecnologia()
+            ],
+            "Receitas": [
+                container.create_with_dependencies(PremissasReceitasPage),
+                container.create_with_dependencies(ReceitasVisualizationPage)
+            ],
+            "Comissões": [
+                PremissasComissao(),
+                ComissaoVendas()
+            ],
+            "Tributos": [
+                PremissasTributos(),
+                Tributos()
+            ],
+            "Projeções": [
+                PremissasProjecoes(),
+                ProjecaodeFluxodeCaixa(),
+                ProjecaoDRE()
+            ]
         }
         
         # Update page configuration
