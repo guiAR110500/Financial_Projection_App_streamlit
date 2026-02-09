@@ -13,8 +13,8 @@ class PremissasReceitasPage(BasePage):
     def __init__(self, state_manager: Optional[SessionStateManager] = None,
                  config_manager: Optional[ConfigManager] = None):
         self._config = config_manager or ConfigManager()
-        super().__init__(state_manager)
         self._service = ReceitasService()
+        super().__init__(state_manager)
     
     @property
     def title(self) -> str:
@@ -313,8 +313,8 @@ class ReceitasVisualizationPage(BasePage):
                  plot_manager: Optional[PlotlyPlotManager] = None):
         self._config = config_manager or ConfigManager()
         self._plot_manager = plot_manager or PlotlyPlotManager()
-        super().__init__(state_manager)
         self._service = ReceitasService()
+        super().__init__(state_manager)
     
     @property
     def title(self) -> str:
@@ -326,8 +326,8 @@ class ReceitasVisualizationPage(BasePage):
     
     def _initialize_state(self) -> None:
         """Initialize visualization state"""
-        if 'premissas_receitas' in self._state_manager.get_state('', {}):
-            premises_data = self._state_manager.get_state('premissas_receitas')
+        premises_data = self._state_manager.get_state('premissas_receitas')
+        if premises_data is not None:
             self._service.load_premises(premises_data)
     
     def _render_content(self) -> None:
@@ -357,7 +357,7 @@ class ReceitasVisualizationPage(BasePage):
     
     def _validate_premises(self) -> bool:
         """Validate that premises exist"""
-        if 'premissas_receitas' not in self._state_manager.get_state('', {}):
+        if self._state_manager.get_state('premissas_receitas') is None:
             st.error("Premissas de receitas não definidas. Configure as premissas na página 'Premissas Receitas'.")
             return False
         return True

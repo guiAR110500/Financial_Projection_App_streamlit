@@ -13,8 +13,8 @@ class PremissasInvestimentosPage(BasePage):
     def __init__(self, state_manager: Optional[SessionStateManager] = None,
                  config_manager: Optional[ConfigManager] = None):
         self._config = config_manager or ConfigManager()
-        super().__init__(state_manager)
         self._service = InvestmentService()
+        super().__init__(state_manager)
     
     @property
     def title(self) -> str:
@@ -277,8 +277,8 @@ class InvestimentosVisualizationPage(BasePage):
                  plot_manager: Optional[PlotlyPlotManager] = None):
         self._config = config_manager or ConfigManager()
         self._plot_manager = plot_manager or PlotlyPlotManager()
-        super().__init__(state_manager)
         self._service = InvestmentService()
+        super().__init__(state_manager)
     
     @property
     def title(self) -> str:
@@ -290,8 +290,8 @@ class InvestimentosVisualizationPage(BasePage):
     
     def _initialize_state(self) -> None:
         """Initialize investment visualization state"""
-        if 'premissas_investimentos' in self._state_manager.get_state('', {}):
-            premises_data = self._state_manager.get_state('premissas_investimentos')
+        premises_data = self._state_manager.get_state('premissas_investimentos')
+        if premises_data is not None:
             self._service.load_premises(premises_data)
     
     def _render_content(self) -> None:
@@ -320,7 +320,7 @@ class InvestimentosVisualizationPage(BasePage):
     
     def _validate_premises(self) -> bool:
         """Validate that premises exist"""
-        if 'premissas_investimentos' not in self._state_manager.get_state('', {}):
+        if self._state_manager.get_state('premissas_investimentos') is None:
             st.error("Premissas de investimentos não definidas. Por favor, defina as premissas na página 'Premissas Investimentos'.")
             return False
         
