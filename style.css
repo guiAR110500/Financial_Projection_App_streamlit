@@ -1,0 +1,13 @@
+.styled-title {
+    background-color: #f0f2f6;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.styled-title h1,
+.styled-title h2,
+.styled-title h3 {
+    color: #262730;
+    margin: 0;
+}

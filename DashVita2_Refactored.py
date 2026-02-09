@@ -15,8 +15,8 @@ import sys
 sys.path.append('.')
 from DashVita2 import (
     PremissasComissao, ComissaoVendas, PremissasTributos, Tributos,
-    Equipe, CustosTecnologia, PremissasProjecoes, ProjecaodeFluxodeCaixa,
-    ProjecaoDRE, PaginaAcompanhamento, MetasColabs, ProjecaoInicial
+    Equipe, CustosTecnologia, PremissasProjeções, ProjeçãodeFluxodeCaixa,
+    ProjeçãoDRE, PaginaAcompanhamento, MetasColabs, ProjeçãoInicial
 )
 
 class Application:
@@ -38,7 +38,7 @@ class Application:
             "Página Inicial": [
                 PaginaAcompanhamento(),
                 MetasColabs(), 
-                ProjecaoInicial()
+                ProjeçãoInicial()
             ],
             "Investimentos": [
                 container.create_with_dependencies(PremissasInvestimentosPage),
@@ -63,9 +63,9 @@ class Application:
                 Tributos()
             ],
             "Projeções": [
-                PremissasProjecoes(),
-                ProjecaodeFluxodeCaixa(),
-                ProjecaoDRE()
+                PremissasProjeções(),
+                ProjeçãodeFluxodeCaixa(),
+                ProjeçãoDRE()
             ]
         }
         
