@@ -1,7 +1,7 @@
 import streamlit as st
 from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any
-from .interfaces import IPage, IStateManager
+from .interfaces import IPage, IStateManager, ICalculator
 
 class BasePage(IPage):
     """Base class for all pages following Template Method pattern"""
