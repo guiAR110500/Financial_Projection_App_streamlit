@@ -1,11 +1,14 @@
+from typing import Optional, Union
+
 import pandas as pd
 import streamlit as st
-from typing import Optional
+
 from core.interfaces import IDataHandler
+
 
 class CSVDataHandler(IDataHandler):
     """Handles CSV data operations (Single Responsibility Principle)"""
-    
+
     def load_data(self, source: str, separator: str = ';') -> Optional[pd.DataFrame]:
         """Load data from CSV file
         
@@ -21,7 +24,7 @@ class CSVDataHandler(IDataHandler):
         except Exception as e:
             st.error(f"Erro ao carregar o arquivo {source}: {e}")
             return None
-    
+
     def save_data(self, data: pd.DataFrame, destination: str, separator: str = ';') -> bool:
         """Save DataFrame to CSV file
         
@@ -43,8 +46,8 @@ class CSVDataHandler(IDataHandler):
 
 class ExcelDataHandler(IDataHandler):
     """Handles Excel data operations (Single Responsibility Principle)"""
-    
-    def load_data(self, source: str, sheet_name: str = 0) -> Optional[pd.DataFrame]:
+
+    def load_data(self, source: str, sheet_name: Union[str, int] = 0) -> Optional[pd.DataFrame]:
         """Load data from Excel file
         
         Args:
@@ -59,7 +62,7 @@ class ExcelDataHandler(IDataHandler):
         except Exception as e:
             st.error(f"Erro ao carregar o arquivo Excel {source}: {e}")
             return None
-    
+
     def save_data(self, data: pd.DataFrame, destination: str, sheet_name: str = 'Sheet1') -> bool:
         """Save DataFrame to Excel file
         

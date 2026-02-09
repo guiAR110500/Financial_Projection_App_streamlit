@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any
 from enum import Enum
+from typing import List
+
 
 class RegimeTributario(Enum):
     SIMPLES_NACIONAL = "Simples Nacional"
@@ -21,7 +22,7 @@ class SimplesNacionalParams:
     aliquota: float = 6.0  # Base rate percentage
     faixa_atual: SimplesNacionalFaixa = SimplesNacionalFaixa.FAIXA_1
     receita_acumulada_12m: float = 0.0
-    
+
     # Rate ranges for different revenue brackets
     faixas_aliquotas = {
         SimplesNacionalFaixa.FAIXA_1: {"min": 0, "max": 180000, "rate": 4.0},
@@ -31,7 +32,7 @@ class SimplesNacionalParams:
         SimplesNacionalFaixa.FAIXA_5: {"min": 1800000.01, "max": 3600000, "rate": 14.3},
         SimplesNacionalFaixa.FAIXA_6: {"min": 3600000.01, "max": 4800000, "rate": 19.0}
     }
-    
+
     def calculate_rate(self, receita_12m: float) -> float:
         """Calculate the appropriate tax rate based on 12-month revenue"""
         for faixa, params in self.faixas_aliquotas.items():
@@ -45,7 +46,7 @@ class LucroPresumidoParams:
     """Parameters for Lucro Presumido tax regime"""
     percentual_presuncao_servicos: float = 32.0  # Presumption percentage for services
     percentual_presuncao_vendas: float = 8.0     # Presumption percentage for sales
-    
+
     # Tax rates
     irpj_rate: float = 15.0  # IRPJ rate
     adicional_irpj_rate: float = 10.0  # Additional IRPJ rate (over R$ 20k/month)
@@ -53,10 +54,10 @@ class LucroPresumidoParams:
     pis_rate: float = 0.65   # PIS rate
     cofins_rate: float = 3.0 # COFINS rate
     iss_rate: float = 5.0    # ISS rate (varies by municipality)
-    
+
     # Additional parameters
     limite_adicional_irpj: float = 20000.0  # Monthly limit for additional IRPJ
-    
+
     def calculate_presumed_profit(self, receita_bruta_servicos: float, receita_bruta_vendas: float) -> float:
         """Calculate presumed profit"""
         lucro_presumido_servicos = receita_bruta_servicos * (self.percentual_presuncao_servicos / 100)
@@ -73,10 +74,10 @@ class LucroRealParams:
     pis_rate: float = 1.65   # PIS rate (non-cumulative)
     cofins_rate: float = 7.6 # COFINS rate (non-cumulative)
     iss_rate: float = 5.0    # ISS rate
-    
+
     # Additional parameters
     limite_adicional_irpj: float = 20000.0  # Monthly limit for additional IRPJ
-    
+
     # Deductions and adjustments
     deducoes_permitidas: List[str] = field(default_factory=lambda: [
         "Despesas operacionais",
@@ -93,7 +94,7 @@ class ImpostoCalculado:
     aliquota: float
     valor: float
     observacoes: str = ""
-    
+
     @property
     def aliquota_percentual(self) -> str:
         """Get tax rate as formatted percentage"""
@@ -104,54 +105,54 @@ class TributosPremises:
     """Premises for tax calculation"""
     # Tax regime
     regime_tributario: RegimeTributario = RegimeTributario.SIMPLES_NACIONAL
-    
+
     # Regime-specific parameters
     simples_params: SimplesNacionalParams = field(default_factory=SimplesNacionalParams)
     lucro_presumido_params: LucroPresumidoParams = field(default_factory=LucroPresumidoParams)
     lucro_real_params: LucroRealParams = field(default_factory=LucroRealParams)
-    
+
     # Revenue breakdown for tax calculation
     receita_servicos_percentual: float = 100.0  # Percentage of revenue from services
     receita_vendas_percentual: float = 0.0      # Percentage of revenue from sales
-    
+
     # Additional parameters
     considerar_substituicao_tributaria: bool = False
     considerar_retencao_fonte: bool = False
     percentual_retencao_fonte: float = 1.5
-    
+
     # Municipal tax parameters (varies by location)
     aliquota_iss: float = 5.0  # ISS rate
     municipio: str = "São Paulo"
-    
+
     # State tax parameters (if applicable)
     aliquota_icms: float = 18.0  # ICMS rate (for sales)
     estado: str = "SP"
-    
+
     def validate_percentual_receitas(self) -> bool:
         """Validate that revenue percentages sum to 100%"""
         total = self.receita_servicos_percentual + self.receita_vendas_percentual
         return abs(total - 100.0) < 0.01
-    
+
     def get_receita_servicos(self, receita_total: float) -> float:
         """Calculate services revenue portion"""
         return receita_total * (self.receita_servicos_percentual / 100)
-    
+
     def get_receita_vendas(self, receita_total: float) -> float:
         """Calculate sales revenue portion"""
         return receita_total * (self.receita_vendas_percentual / 100)
-    
+
     def calculate_taxes(self, receita_bruta: float, despesas_dedutiveis: float = 0.0) -> List[ImpostoCalculado]:
         """Calculate taxes based on the selected regime"""
         impostos = []
-        
+
         receita_servicos = self.get_receita_servicos(receita_bruta)
         receita_vendas = self.get_receita_vendas(receita_bruta)
-        
+
         if self.regime_tributario == RegimeTributario.SIMPLES_NACIONAL:
             # Calculate cumulative 12-month revenue (simplified for this example)
             receita_12m = receita_bruta * 12  # This should be properly accumulated
             aliquota = self.simples_params.calculate_rate(receita_12m)
-            
+
             valor_simples = receita_bruta * (aliquota / 100)
             impostos.append(ImpostoCalculado(
                 nome="Simples Nacional",
@@ -160,25 +161,25 @@ class TributosPremises:
                 valor=valor_simples,
                 observacoes="Unificado: IRPJ, CSLL, PIS, COFINS, ISS"
             ))
-            
+
         elif self.regime_tributario == RegimeTributario.LUCRO_PRESUMIDO:
             params = self.lucro_presumido_params
-            
+
             # Calculate presumed profit
             lucro_presumido = params.calculate_presumed_profit(receita_servicos, receita_vendas)
-            
+
             # IRPJ
             valor_irpj = lucro_presumido * (params.irpj_rate / 100)
             if lucro_presumido > params.limite_adicional_irpj:
                 valor_irpj += (lucro_presumido - params.limite_adicional_irpj) * (params.adicional_irpj_rate / 100)
-            
+
             impostos.append(ImpostoCalculado(
                 nome="IRPJ",
                 base_calculo=lucro_presumido,
                 aliquota=params.irpj_rate,
                 valor=valor_irpj
             ))
-            
+
             # CSLL
             valor_csll = lucro_presumido * (params.csll_rate / 100)
             impostos.append(ImpostoCalculado(
@@ -187,7 +188,7 @@ class TributosPremises:
                 aliquota=params.csll_rate,
                 valor=valor_csll
             ))
-            
+
             # PIS
             valor_pis = receita_bruta * (params.pis_rate / 100)
             impostos.append(ImpostoCalculado(
@@ -196,7 +197,7 @@ class TributosPremises:
                 aliquota=params.pis_rate,
                 valor=valor_pis
             ))
-            
+
             # COFINS
             valor_cofins = receita_bruta * (params.cofins_rate / 100)
             impostos.append(ImpostoCalculado(
@@ -205,7 +206,7 @@ class TributosPremises:
                 aliquota=params.cofins_rate,
                 valor=valor_cofins
             ))
-            
+
             # ISS (only on services)
             if receita_servicos > 0:
                 valor_iss = receita_servicos * (self.aliquota_iss / 100)
@@ -215,25 +216,25 @@ class TributosPremises:
                     aliquota=self.aliquota_iss,
                     valor=valor_iss
                 ))
-        
+
         elif self.regime_tributario == RegimeTributario.LUCRO_REAL:
             params = self.lucro_real_params
-            
+
             # For Lucro Real, we need the actual profit (revenue - deductible expenses)
             lucro_real = receita_bruta - despesas_dedutiveis
-            
+
             # IRPJ
             valor_irpj = max(0, lucro_real * (params.irpj_rate / 100))
             if lucro_real > params.limite_adicional_irpj:
                 valor_irpj += (lucro_real - params.limite_adicional_irpj) * (params.adicional_irpj_rate / 100)
-            
+
             impostos.append(ImpostoCalculado(
                 nome="IRPJ",
                 base_calculo=lucro_real,
                 aliquota=params.irpj_rate,
                 valor=valor_irpj
             ))
-            
+
             # CSLL
             valor_csll = max(0, lucro_real * (params.csll_rate / 100))
             impostos.append(ImpostoCalculado(
@@ -242,7 +243,7 @@ class TributosPremises:
                 aliquota=params.csll_rate,
                 valor=valor_csll
             ))
-            
+
             # PIS (non-cumulative)
             valor_pis = receita_bruta * (params.pis_rate / 100)
             impostos.append(ImpostoCalculado(
@@ -252,7 +253,7 @@ class TributosPremises:
                 valor=valor_pis,
                 observacoes="Regime não-cumulativo"
             ))
-            
+
             # COFINS (non-cumulative)
             valor_cofins = receita_bruta * (params.cofins_rate / 100)
             impostos.append(ImpostoCalculado(
@@ -262,7 +263,7 @@ class TributosPremises:
                 valor=valor_cofins,
                 observacoes="Regime não-cumulativo"
             ))
-            
+
             # ISS (only on services)
             if receita_servicos > 0:
                 valor_iss = receita_servicos * (self.aliquota_iss / 100)
@@ -272,9 +273,9 @@ class TributosPremises:
                     aliquota=self.aliquota_iss,
                     valor=valor_iss
                 ))
-        
+
         return impostos
-    
+
     @property
     def total_impostos(self) -> float:
         """Calculate total tax burden (simplified calculation)"""

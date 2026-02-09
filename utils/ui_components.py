@@ -1,5 +1,6 @@
+
 import streamlit as st
-from typing import Optional
+
 
 def load_css():
     """Load custom CSS from file"""
@@ -36,9 +37,9 @@ def create_info_box(text: str, box_type: str = "info"):
         "error": "#f8d7da",
         "success": "#d4edda"
     }
-    
+
     color = color_map.get(box_type, color_map["info"])
-    
+
     st.markdown(f"""
         <div style="background-color: {color}; padding: 10px; border-radius: 5px; margin: 10px 0;">
             {text}
