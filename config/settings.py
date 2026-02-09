@@ -7,7 +7,7 @@ class AppSettings:
     """Application settings (Single Responsibility Principle)"""
     
     # UI Settings
-    logo_path: str = "C:\\Users\\Guilherme\\Documents\\Scratch\\TuaVitaLogo.jpg"
+    logo_path: str = "assets/TuaVitaLogo.jpg"
     app_title: str = "TuaVita Dashboard"
     app_version: str = "v1.0"
     

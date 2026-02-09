@@ -8963,7 +8963,7 @@ class Dashboard:
     def render(self):
         # Display logo at the top of the sidebar
         try:
-            logo_path = "C:\\Users\\Guilherme\\Documents\\Scratch\\TuaVitaLogo.jpg"
+            logo_path = "assets/TuaVitaLogo.jpg"
             st.sidebar.image(logo_path, width=300)
         except Exception as e:
             st.sidebar.error(f"Could not load logo: {e}")
